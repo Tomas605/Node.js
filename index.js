@@ -1,5 +1,5 @@
 const express = require('express');
-const cors = require("cors")
+const cors = require('cors');
 
 const app = express();
 app.use(cors());
@@ -7,10 +7,11 @@ app.use(cors());
 let count = 0;
 
 app.listen(9000, () => {
-    console.log('serveris paleistas!');
+    console.log(`Serveris paleistas. Užklausų skaičius: ${count}`);
 });
 
-app.get('/counter', (request, response) => {
+app.get('/', (request, response) => {
     count++;
-    response.send(`Užklausų skaičius: ${count}`);
+    console.log(`Užklausų skaičius: ${count}`);
+    response.json(count);
 });
