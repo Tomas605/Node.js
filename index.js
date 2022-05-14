@@ -1,17 +1,27 @@
 const express = require('express');
-const cors = require('cors');
 
 const app = express();
-app.use(cors());
-
-let count = 0;
 
 app.listen(9000, () => {
-    console.log(`Serveris paleistas. Užklausų skaičius: ${count}`);
+    console.log(`Serveris paleistas. Laukia užklausų`);
 });
 
-app.get('/', (request, response) => {
-    count++;
-    console.log(`Užklausų skaičius: ${count}`);
-    response.json(count);
+app.get('/barista/:gerimas/:kiekis', (request, response) => {
+    console.log(request.params);
+
+    const gerimoPavadinimas = request.params.gerimas;
+    const puodeliuKiekis = request.params.kiekis;
+
+    console.log('pasiimam puodeli');
+    console.log(`ipilam ${gerimoPavadinimas} i puodeli`);
+
+    response.json(`${puodeliuKiekis} puodelis ${gerimoPavadinimas}`);
+    console.log('atiduodam puodeli');
+
+    if (puodeliuKiekis > 1) {
+        console.log('tvarkom darbo vieta');
+        return;
+    }
+
+    console.log('laukiam sekancio kliento');
 });
