@@ -1,27 +1,16 @@
 const express = require('express');
-
 const app = express();
+
+const knygos = [
+'Haris Poteris',
+'Biblija',
+'1984',
+]
 
 app.listen(9000, () => {
     console.log(`Serveris paleistas. Laukia užklausų`);
 });
 
-app.get('/barista/:gerimas/:kiekis', (request, response) => {
-    console.log(request.params);
-
-    const gerimoPavadinimas = request.params.gerimas;
-    const puodeliuKiekis = request.params.kiekis;
-
-    console.log('pasiimam puodeli');
-    console.log(`ipilam ${gerimoPavadinimas} i puodeli`);
-
-    response.json(`${puodeliuKiekis} puodelis ${gerimoPavadinimas}`);
-    console.log('atiduodam puodeli');
-
-    if (puodeliuKiekis > 1) {
-        console.log('tvarkom darbo vieta');
-        return;
-    }
-
-    console.log('laukiam sekancio kliento');
+app.get('/books', (request, response) => {
+   response.json(knygos);
 });
