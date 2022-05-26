@@ -2,16 +2,55 @@ require('dotenv').config();
 
 const express = require('express');
 
+const { MongoClient, ServerApiVersion } = require('mongodb');
+
+const uri = 'mongodb://localhost:27017';
+const client = new MongoClient(uri, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+  serverApi: ServerApiVersion.v1,
+});
+
 const app = express();
 
 const knygos = [
-  'Haris Poteris',
-  'Biblija',
-  '1984',
+  'Haris porteris',
+  'Dziungliu knyga',
 ];
 
-app.listen(process.env.Port, () => {
+app.listen(process.env.PORT, () => {
   console.log('Serveris paleistas. Laukia užklausų');
+});
+
+app.get('/books', (request, response) => {
+  client.connect(async () => {
+    const database = client.db('knygu-projektas');
+    const collection = database.collection('knygos');
+    const result = await collection.find({}).toArray();
+
+    response.json(result);
+
+    client.close();
+  });
+});
+
+app.get('/books/:id', (request, response) => {
+  response.json(knygos);
+});
+
+app.post('/books', (request, response) => {
+  client.connect(async () => {
+    const database = client.db('knygu-projektas');
+    const collection = database.collection('knygos');
+    const result = await collection.insertOne({
+      name: request.body.bookName,
+      pageCount: request.body.bookPageCount,
+    });
+
+    response.json(result);
+
+    client.close();
+  });
 });
 
 app.get('/books/:from/:to', (request, response) => {
