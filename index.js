@@ -1,63 +1,56 @@
 require('dotenv').config();
-
+const cors = require('cors');
 const express = require('express');
+const {
+  MongoClient,
+  ObjectId,
+} = require('mongodb');
 
-const { MongoClient, ServerApiVersion } = require('mongodb');
-
-const uri = 'mongodb://localhost:27017';
-const client = new MongoClient(uri, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-  serverApi: ServerApiVersion.v1,
-});
+const client = new MongoClient(process.env.DB_URI);
 
 const app = express();
 
-const knygos = [
-  'Haris porteris',
-  'Dziungliu knyga',
-];
+app.use(express.json());
+app.use(cors());
 
-app.listen(process.env.PORT, () => {
-  console.log('Serveris paleistas. Laukia užklausų');
-});
+app.listen(process.env.PORT);
 
 app.get('/books', (request, response) => {
   client.connect(async () => {
-    const database = client.db('knygu-projektas');
-    const collection = database.collection('knygos');
+    const database = client.db(process.env.DB_NAME);
+    const collection = database.collection(process.env.DB_COLLECTION_NAME);
     const result = await collection.find({}).toArray();
+    client.close();
 
     response.json(result);
-
-    client.close();
   });
-});
-
-app.get('/books/:id', (request, response) => {
-  response.json(knygos);
 });
 
 app.post('/books', (request, response) => {
   client.connect(async () => {
-    const database = client.db('knygu-projektas');
-    const collection = database.collection('knygos');
+    const database = client.db(process.env.DB_NAME);
+    const collection = database.collection(process.env.DB_COLLECTION_NAME);
     const result = await collection.insertOne({
-      name: request.body.bookName,
-      pageCount: request.body.bookPageCount,
+      title: request.body.title,
+      pageCount: request.body.pageCount,
+      price: request.body.price,
     });
+    client.close();
 
     response.json(result);
-
-    client.close();
   });
 });
 
-app.get('/books/:from/:to', (request, response) => {
-  const fromIndex = request.params.from;
-  const toIndex = request.params.to;
+app.delete('/books', (request, response) => {
+  client.connect(async () => {
+    const database = client.db(process.env.DB_NAME);
+    const collection = database.collection(process.env.DB_COLLECTION_NAME);
 
-  const atgnybtasMasyvas = knygos.slice(fromIndex, toIndex);
+    const result = await collection.deleteOne({
+      _id: ObjectId(request.body.id),
+    });
+    client.close();
 
-  response.json(atgnybtasMasyvas);
+    response.json(result);
+  });
 });
